@@ -39,15 +39,15 @@ class Entity:
         return self._name
 
     @property
-    def topleft_position(self):
+    def position(self):
         return self._position
 
     @property
     def pixel_position(self):
         return int(self._position.x), int(self._position.y)
 
-    @topleft_position.setter
-    def topleft_position(self, new_topleft: Coordinate):
+    @position.setter
+    def position(self, new_topleft: Coordinate):
         self._position = get_coords_as_vector2(new_topleft)
 
     @property
@@ -70,9 +70,7 @@ class Entity:
         self._components_destroyed.clear()
 
     def create_component(self, component_type: type[ComponentType]) -> ComponentType:
-        created_component_insance = component_type(
-            component_id=self._next_component_id, parent=self
-        )
+        created_component_insance = component_type(component_id=self._next_component_id, parent=self)
 
         for var_name, annotation in component_type.__annotations__.items():
             if hasattr(component_type, var_name):
@@ -113,24 +111,18 @@ class Entity:
 
             yield component
 
-    def get_component_by_type(
-        self, component_type: type[ComponentType]
-    ) -> ComponentType | None:
+    def get_component_by_type(self, component_type: type[ComponentType]) -> ComponentType | None:
         for component in self.get_components():
             if isinstance(component, component_type):
                 return component
 
-    def get_all_components_of_type(
-        self, component_type: type[ComponentType]
-    ) -> list[ComponentType]:
+    def get_all_components_of_type(self, component_type: type[ComponentType]) -> list[ComponentType]:
         return [c for c in self.get_components() if isinstance(c, component_type)]
 
     def get_component_by_id(self, component_id: int):
         component = [c for c in self.get_components() if c.component_id == component_id]
         if not component:
-            raise KeyError(
-                f"Component with ID `{component_id}` doesn't exist on `{self.name}`."
-            )
+            raise KeyError(f"Component with ID `{component_id}` doesn't exist on `{self.name}`.")
 
         return component[0]
 

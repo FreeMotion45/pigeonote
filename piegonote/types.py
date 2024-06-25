@@ -1,6 +1,7 @@
-from pygame import Vector2
+from pygame import Vector2, Color as PyGameColor
 
-Coordinate = tuple[int, int] | Vector2
+Coordinate = tuple[int | float, int | float] | Vector2
+Color = int | str | tuple[int, int, int] | tuple[int, int, int, int] | PyGameColor
 
 
 def get_coords_as_vector2(coord: Coordinate):
@@ -11,7 +12,7 @@ def get_coords_as_vector2(coord: Coordinate):
     return coord
 
 
-def get_coords_as_tuple(coord: Coordinate) -> tuple[float, float] | tuple[int, int]:
+def get_coords_as_tuple(coord: Coordinate) -> tuple[int | float, int | float]:
     if isinstance(coord, Vector2):
         return (coord.x, coord.y)
 

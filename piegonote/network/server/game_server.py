@@ -65,15 +65,11 @@ class GameServer(Service):
 
         self._event_handlers[event].append(callback)
 
-    def _send_datagram(
-        self, datagram: Datagram, recipients: Optional[list[int]] = None
-    ):
+    def _send_datagram(self, datagram: Datagram, recipients: Optional[list[int]] = None):
         if recipients is not None and len(recipients) == 0:
             return
 
-        self._outgoing_datagrams.append(
-            OutgoingDatagram(datagram=datagram, recipients=recipients)
-        )
+        self._outgoing_datagrams.append(OutgoingDatagram(datagram=datagram, recipients=recipients))
 
     def _generate_networked_entity_id(self):
         new = self._next_networked_entity_id
@@ -98,9 +94,7 @@ class GameServer(Service):
         new_clients = self._server.accept_connections()
         for new_client_id in new_clients:
             self._server.send_message(
-                self.formatter.serialize(
-                    ClientIDExchangeDatagram(client_id=new_client_id)
-                ),
+                self.formatter.serialize(ClientIDExchangeDatagram(client_id=new_client_id)),
                 recipients=[new_client_id],
             )
             self._unacked_clients.append(new_client_id)
@@ -125,9 +119,7 @@ class GameServer(Service):
             elif client_id in self._unacked_clients:
                 if datagram.datagram_type != DatagramType.ClientIDExchangeAck:
                     # TODO: instead, don't raise exception. Disconnect client and resume to normal flow.
-                    raise Exception(
-                        "Client didn't respond with an appropriate ACK message."
-                    )
+                    raise Exception("Client didn't respond with an appropriate ACK message.")
 
                 print(f"[SERVER] New client connected: {client_id}.")
                 self._connected_clients.append(client_id)
@@ -149,9 +141,7 @@ class GameServer(Service):
                 args, kwargs = deserialized_json["a"], deserialized_json["k"]
 
                 net_entity = self._networked_entities[datagram.net_entity_id]
-                net_component = net_entity.entity.get_component_by_id(
-                    datagram.component_id
-                )
+                net_component = net_entity.entity.get_component_by_id(datagram.component_id)
 
                 rpc_method = getattr(net_component, datagram.method_name)
                 GameServer.EXECUTING_RPC = True
@@ -160,18 +150,14 @@ class GameServer(Service):
 
                 # If it's for everyone, send to everyone.
                 if datagram.rpc_recipient == 1:
-                    everyone_except_sender = [
-                        other for other in self._connected_clients if other != client_id
-                    ]
+                    everyone_except_sender = [other for other in self._connected_clients if other != client_id]
                     forwaded_dgram = ToClientExecuteRPCDatagram(
                         net_entity_id=datagram.net_entity_id,
                         component_id=datagram.component_id,
                         method_name=datagram.method_name,
                         params=datagram.params,
                     )
-                    self._send_datagram(
-                        forwaded_dgram, recipients=everyone_except_sender
-                    )
+                    self._send_datagram(forwaded_dgram, recipients=everyone_except_sender)
 
     def _handle_outgoing_datagrams(self):
         messages = dict[ConnectionID, BytesIO]()
@@ -204,23 +190,18 @@ class GameServer(Service):
 
     def _sync_client(self, client_id: ConnectionID):
         for net_entity_id, net_entity_data in self._networked_entities.items():
-            if (
-                net_entity_data.entity.get_component_by_type(NetworkedComponent).owner
-                == client_id
-            ):
+            if net_entity_data.entity.get_component_by_type(NetworkedComponent).owner == client_id:
                 continue
 
             # TODO: this is obviously wrong, since ownership is per component, and not object.
             # Get arbitrary owner of some network component.
-            owner = net_entity_data.entity.get_component_by_type(
-                NetworkedComponent
-            ).owner
+            owner = net_entity_data.entity.get_component_by_type(NetworkedComponent).owner
 
             dgram = SpawnNetworkEntityDatagram(
                 prefab_name=net_entity_data.prefab,
                 owner=owner,
                 network_entity_id=net_entity_id,
-                position=net_entity_data.entity.topleft_position,
+                position=net_entity_data.entity.position,
                 rotation=int(net_entity_data.entity.rotation),
             )
 
@@ -228,9 +209,7 @@ class GameServer(Service):
             #     dgram,
             #     recipients=[client_id],
             # )
-            self._server.send_message(
-                self.formatter.serialize(dgram), recipients=[client_id]
-            )
+            self._server.send_message(self.formatter.serialize(dgram), recipients=[client_id])
 
     def spawn_entity(
         self,
@@ -242,12 +221,10 @@ class GameServer(Service):
         net_entity_id = self._generate_networked_entity_id()
 
         new_entity = self.prefab_factories[prefab]()
-        new_entity.topleft_position = position
+        new_entity.position = position
         new_entity.rotation = rotation
 
-        for networked_component in new_entity.get_all_components_of_type(
-            NetworkedComponent
-        ):
+        for networked_component in new_entity.get_all_components_of_type(NetworkedComponent):
             networked_component.private_fw_set_entity_id(net_entity_id)
             networked_component.private_fw_set_owner(owner)
 

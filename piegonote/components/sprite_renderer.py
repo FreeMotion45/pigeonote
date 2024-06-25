@@ -1,25 +1,36 @@
-from typing import TYPE_CHECKING, Optional
+from typing import Optional
 
 import pygame as pg
 
-from piegonote import Component, Entity, Game
-
-if TYPE_CHECKING:
-    from piegonote import Entity
+from piegonote import Component
 
 
 class SpriteRenderer(Component):
-    def __init__(self, component_id: int, parent: Entity) -> None:
-        super().__init__(component_id, parent)
-        self.sprite_surface: Optional[pg.Surface] = None
+    sprite_surface: Optional[pg.Surface] = None
 
-    def set_sprite(self, sprite: Optional[pg.Surface]):
-        self.sprite_surface = sprite
+    def init(self):
+        self._mutated_surface: pg.Surface | None = None
+        self._previous_mutated_rotation: int = 0
 
     def render(self):
         if self.sprite_surface:
             if self.rotation == 0:
-                self.game.camera.blit(self.sprite_surface, self.pixel_position)
+                surface_to_blit = self.sprite_surface
+
+            elif round(self.rotation) == self._previous_mutated_rotation:
+                assert self._mutated_surface is not None
+                surface_to_blit = self._mutated_surface
+
             else:
                 rotated = pg.transform.rotate(self.sprite_surface, self.rotation)
-                self.game.camera.blit(rotated, self.pixel_position)
+                surface_to_blit = rotated
+
+                self._mutated_surface = rotated
+                self._previous_mutated_rotation = round(self.rotation)
+
+            # Using the Rect below because it can easily calculate for us what the "topleft"
+            # coordinate should be for `pixel_position` as the center.
+            rect = pg.Rect((0, 0), surface_to_blit.size)
+            rect.center = self.pixel_position
+
+            self.game.camera.blit(surface_to_blit, rect.topleft)

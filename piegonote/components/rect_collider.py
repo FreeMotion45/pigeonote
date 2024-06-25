@@ -42,7 +42,7 @@ class RectCollider(Collider):
         super().update()
 
         if self._draw_debug_outline:
-            self.game.camera.draw_rect_outline(Rect(self.topleft_position, self.size))
+            self.game.camera.draw_rect_outline(Rect(self.position, self.size))
 
     def check_rect_overlap(self, rect: Rect):
-        return Rect(self.topleft_position + self.offset, self.size).colliderect(rect)
+        return Rect(self.position + self.offset, self.size).colliderect(rect)

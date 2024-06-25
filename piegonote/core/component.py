@@ -43,12 +43,12 @@ class Component(abc.ABC):
         return self._entity
 
     @property
-    def topleft_position(self):
-        return self._entity.topleft_position
+    def position(self):
+        return self._entity.position
 
-    @topleft_position.setter
-    def topleft_position(self, new_topleft: pg.Vector2):
-        self._entity.topleft_position = new_topleft
+    @position.setter
+    def position(self, new_topleft: pg.Vector2):
+        self._entity.position = new_topleft
 
     @property
     def rotation(self):
@@ -118,9 +118,7 @@ class Component(abc.ABC):
                 callback()
 
         self._scheduled_callbacks = [
-            (cb, time_left - self.dt)
-            for cb, time_left in self._scheduled_callbacks
-            if time_left > 0
+            (cb, time_left - self.dt) for cb, time_left in self._scheduled_callbacks if time_left > 0
         ]
 
         self.update()

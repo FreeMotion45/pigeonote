@@ -20,19 +20,22 @@ class Game:
 
         return Game.instance
 
-    def __init__(
-        self, display: Optional[pg.Surface] = None, target_fps: int = 60
-    ) -> None:
+    def __init__(self, display: Optional[pg.Surface] = None, target_fps: int = 60) -> None:
+        self._is_actual_display = False
         if not display:
             pg.init()
-            display = pg.display.set_mode((600, 600), flags=pg.RESIZABLE)
+            display = pg.display.set_mode((16 * 100, 9 * 100), flags=pg.RESIZABLE)
+            self._is_actual_display = True
             pg.display.set_caption("Your my_fw game")
 
         self._running = False
 
         self._display = display
 
-        self._camera2d = Camera2D(area=pg.Rect((0, 0), self._display.get_size()))
+        camera_view_area = pg.Rect((0, 0), (16 * 25, 9 * 25))
+        camera_view_area.center = (0, 0)
+        self._camera2d = Camera2D(area=camera_view_area)
+
         self._entities = list[Entity]()
         self._services = list[Service]()
 
@@ -70,7 +73,11 @@ class Game:
 
     @property
     def mouse_screen_position(self):
-        return pg.Vector2(pg.mouse.get_pos())
+        mouse_pos_x, mouse_pos_y = pg.mouse.get_pos()
+        camera_width, camera_height = self._camera2d.area.size
+        display_width, display_height = pg.display.get_surface().size
+        scale_x, scale_y = (camera_width / display_width, camera_height / display_height)
+        return pg.Vector2(mouse_pos_x * scale_x, mouse_pos_y * scale_y)
 
     def is_mouse_btn_down(self, button: MouseButton):
         return button in self._mouse_btns_down
@@ -103,17 +110,13 @@ class Game:
             name = f"entity_{str(uuid.uuid4())}"
 
         if self.find_entity_by_name(name):
-            raise KeyError(
-                f"Can't create entity with name: `{name}`, because an entity with this name already exists."
-            )
+            raise KeyError(f"Can't create entity with name: `{name}`, because an entity with this name already exists.")
 
         new_entity = Entity(name=name, position=position, game=self)
         self._entities.append(new_entity)
         return new_entity
 
-    def create_service(
-        self, service_type: type[ServiceType], name: Optional[str] = None
-    ) -> ServiceType:
+    def create_service(self, service_type: type[ServiceType], name: Optional[str] = None) -> ServiceType:
         if name is None:
             name = f"service_{service_type.__name__}_{str(uuid.uuid4())}"
 
@@ -135,62 +138,65 @@ class Game:
     def run(self):
         self.initialize()
         self.game_loop()
-        
+
         pg.quit()
 
     def game_loop(self):
         self._running = True
         while self._running:
-            self._display.fill("black")
+            self.process()
 
-            self.camera.clean_surface()
+            if self._is_actual_display:
+                pg.display.flip()
 
-            self._keys_down.clear()
-            self._keys_up.clear()
+    def process(self):
+        self._display.fill("black")
 
-            self._mouse_btns_down.clear()
-            self._mouse_btns_up.clear()
+        self.camera.clean_surface()
 
-            for event in pg.event.get():
-                match event.type:
-                    case pg.QUIT:
-                        self._running = False
-                        return
+        self._keys_down.clear()
+        self._keys_up.clear()
 
-                    case pg.KEYDOWN:
-                        self._keys_down.add(event.key)
-                        self._keys_pressed.add(event.key)
+        self._mouse_btns_down.clear()
+        self._mouse_btns_up.clear()
 
-                    case pg.KEYUP:
-                        self._keys_up.add(event.key)
-                        self._keys_pressed.remove(event.key)
+        for event in pg.event.get():
+            match event.type:
+                case pg.QUIT:
+                    self._running = False
+                    return False
 
-                    case pg.MOUSEBUTTONDOWN:
-                        mouse_button = MouseButton(event.button)
-                        self._mouse_btns_down.add(mouse_button)
-                        self._mouse_btns_pressed.add(mouse_button)
+                case pg.KEYDOWN:
+                    self._keys_down.add(event.key)
+                    self._keys_pressed.add(event.key)
 
-                    case pg.MOUSEBUTTONUP:
-                        mouse_button = MouseButton(event.button)
-                        self._mouse_btns_up.add(mouse_button)
-                        self._mouse_btns_pressed.remove(mouse_button)
+                case pg.KEYUP:
+                    self._keys_up.add(event.key)
+                    self._keys_pressed.remove(event.key)
 
-            self._dt = self._clock.tick(self._target_fps) / 1000
-            self.update()
+                case pg.MOUSEBUTTONDOWN:
+                    mouse_button = MouseButton(event.button)
+                    self._mouse_btns_down.add(mouse_button)
+                    self._mouse_btns_pressed.add(mouse_button)
 
-            current_frame_surface = self._camera2d.get_rendered_surface()
-            scaled_frame_surface = pg.transform.scale(
-                current_frame_surface, self._display.get_size()
-            )
+                case pg.MOUSEBUTTONUP:
+                    mouse_button = MouseButton(event.button)
+                    self._mouse_btns_up.add(mouse_button)
+                    self._mouse_btns_pressed.remove(mouse_button)
 
-            self._display.blit(scaled_frame_surface, (0, 0))
+        self._dt = self._clock.tick(self._target_fps) / 1000
+        self.update()
 
-            pg.display.flip()
+        current_frame_surface = self._camera2d.get_rendered_surface()
+        scaled_frame_surface = pg.transform.scale(current_frame_surface, self._display.get_size())
+
+        self._display.blit(scaled_frame_surface, (0, 0))
+        return True
 
     def initialize(self):
         for service in self._services:
             service.initialize()
-            
+
         print(f"pygame driver: {pg.display.get_driver()}.")
 
     def update(self):

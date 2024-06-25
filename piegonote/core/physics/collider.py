@@ -10,7 +10,7 @@ class Collider(Component, metaclass=ABCMeta):
 
     @property
     def collider_position(self):
-        return self.topleft_position + self.offset
+        return self.position + self.offset
 
     def _fire_on_collision_enter(self, other: "Collider"):
         for component in self.entity.get_components():

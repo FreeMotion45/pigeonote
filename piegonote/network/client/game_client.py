@@ -81,9 +81,7 @@ class GameClient(Service):
     def connect(self):
         self._client = TCPClient((self.server_ip, self.server_port))
         self._time_connected: datetime = datetime.now()
-        print(
-            f"[CLIENT] Establishing connection to {self.server_ip}:{self.server_port}"
-        )
+        print(f"[CLIENT] Establishing connection to {self.server_ip}:{self.server_port}")
 
     def update(self):
         if not self._client:
@@ -104,10 +102,7 @@ class GameClient(Service):
         assert self._client is not None
 
         for datagram in self.formatter.iter_deserialize(msg):
-            if (
-                not self._client_id
-                and datagram.datagram_type != DatagramType.ClientIDExchange
-            ):
+            if not self._client_id and datagram.datagram_type != DatagramType.ClientIDExchange:
                 raise Exception(
                     f"[CLIENT] error, server sent invalid first message. Expected to receive message type, but received: {datagram.datagram_type}."
                 )
@@ -150,15 +145,11 @@ class GameClient(Service):
                 assert isinstance(datagram, SpawnNetworkEntityDatagram)
 
                 new_entity = self.prefab_factories[datagram.prefab_name]()
-                new_entity.topleft_position = datagram.position
+                new_entity.position = datagram.position
                 new_entity.rotation = datagram.rotation
 
-                for networked_component in new_entity.get_all_components_of_type(
-                    NetworkedComponent
-                ):
-                    networked_component.private_fw_set_entity_id(
-                        datagram.network_entity_id
-                    )
+                for networked_component in new_entity.get_all_components_of_type(NetworkedComponent):
+                    networked_component.private_fw_set_entity_id(datagram.network_entity_id)
                     networked_component.private_fw_set_owner(datagram.owner)
 
                 self._networked_entities[datagram.network_entity_id] = NetworkedEntity(
@@ -180,9 +171,7 @@ class GameClient(Service):
                 args, kwargs = deserialized_json["a"], deserialized_json["k"]
 
                 net_entity = self._networked_entities[datagram.net_entity_id]
-                net_component = net_entity.entity.get_component_by_id(
-                    datagram.component_id
-                )
+                net_component = net_entity.entity.get_component_by_id(datagram.component_id)
 
                 rpc_method = getattr(net_component, datagram.method_name)
                 GameClient.EXECUTING_RPC = True

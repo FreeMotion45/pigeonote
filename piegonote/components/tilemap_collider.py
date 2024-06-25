@@ -1,6 +1,7 @@
 from pygame import Rect
-from piegonote.core import Collider
+
 from piegonote.components import TilemapRenderer
+from piegonote.core import Collider
 
 
 class TilemapCollider(Collider):
@@ -10,9 +11,7 @@ class TilemapCollider(Collider):
         self._tilemap = self.entity.get_component_by_type(TilemapRenderer)
 
         if self._tilemap is None:
-            self.log(
-                f"No {TilemapRenderer.__name__} was assigned to {self.entity.name}."
-            )
+            self.log(f"No {TilemapRenderer.__name__} was assigned to {self.entity.name}.")
 
     def update(self):
         # TODO: Weird stuff happens in the super() update.

@@ -34,8 +34,11 @@ class TilemapRenderer(Component):
         int_coords = _coords_as_int_tuple(coords)
         return int_coords[0] * self.tile_size, int_coords[1] * self.tile_size
 
-    def get_tile_coords_from_world_position(self, world_position: Coordinate):
-        return world_position[0] // self.tile_size, world_position[1] // self.tile_size
+    def get_tile_coords_from_world_position(self, world_position: Coordinate) -> tuple[int, int]:
+        world_position = get_coords_as_tuple(world_position)
+
+        # Ignoring an analyzer error. Somewhy it can't figure out that `//` will always return an int.
+        return world_position[0] // self.tile_size, world_position[1] // self.tile_size  # type: ignore
 
     def init(self):
         self._tiles = dict[tuple[int, int], str]()
@@ -44,29 +47,14 @@ class TilemapRenderer(Component):
             surface = self.tileset[tile_name]
 
             if surface.width != surface.height:
-                self.log(
-                    f"size of `{tile_name}`s size isn't a square: {surface.width}x{surface.height}."
-                )
+                self.log(f"size of `{tile_name}`s size isn't a square: {surface.width}x{surface.height}.")
 
             elif surface.width != self.tile_size:
                 self.log(
                     f"size of `{tile_name}` is {surface.width}x{surface.height}, which isn't {self.tile_size}x{self.tile_size}. "
                     + "Scaling down..."
                 )
-                self.tileset[tile_name] = pg.transform.scale(
-                    surface, (self.tile_size, self.tile_size)
-                )
-
-        self._gen_x = 0
-        self._gen_y = 0
-
-        self.schedule(self.gen, 1)
-
-    def gen(self):
-        self._tiles[(self._gen_x, self._gen_y)] = "white"
-        self._gen_x += 1
-        self._gen_y += 1
-        self.schedule(self.gen, 1)
+                self.tileset[tile_name] = pg.transform.scale(surface, (self.tile_size, self.tile_size))
 
     def render(self):
         camera = self.game.camera

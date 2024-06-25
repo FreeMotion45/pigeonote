@@ -10,11 +10,17 @@ class SquareRenderer(Component):
         self._surface = pg.Surface((self.size, self.size))
         self._surface.fill(self.color)
 
-    def render(self):
-        # print(self.active_camera.world_position_to_screen_position(self.topleft_position))
+    def render(self):        
+        # Using the Rect below because it can easily calculate for us what the "topleft"
+        # coordinate should be for `pixel_position` as the center.
 
         if self.rotation == 0:
-            self.game.camera.blit(self._surface, self.pixel_position)
+            rect = pg.Rect((0, 0), self._surface.size)
+            rect.center = self.pixel_position
+            self.game.camera.blit(self._surface, rect.topleft)
+
         else:
             rotated = pg.transform.rotate(self._surface, self.rotation)
-            self.game.camera.blit(rotated, self.pixel_position)
+            rect = pg.Rect((0, 0), rotated.size)
+            rect.center = self.pixel_position
+            self.game.camera.blit(rotated, rect.topleft)
