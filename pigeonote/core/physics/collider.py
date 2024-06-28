@@ -2,7 +2,7 @@ from abc import ABCMeta, abstractmethod
 
 from pygame import Rect, Vector2
 
-from piegonote.core import Component
+from pigeonote.core import Component
 
 
 class Collider(Component, metaclass=ABCMeta):
@@ -23,7 +23,7 @@ class Collider(Component, metaclass=ABCMeta):
                 getattr(component, "on_collision_exit")(other)
 
     def init(self):
-        from piegonote.core.physics import Physics
+        from pigeonote.core.physics import Physics
 
         self._PHYSICS = Physics.get_instance()
         self._PHYSICS.internal_add_collider(self)

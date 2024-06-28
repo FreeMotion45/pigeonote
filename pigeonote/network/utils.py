@@ -1,5 +1,5 @@
-from piegonote.network import GameServer
-from piegonote import Vector2, Entity
+from pigeonote.network import GameServer
+from pigeonote import Vector2, Entity
 
 
 def net_spawn(
@@ -9,7 +9,7 @@ def net_spawn(
     rotation: int = 0,
 ):
 
-    from piegonote import Game
+    from pigeonote import Game
 
     try:
         server = Game.get_instance().find_service_by_type(GameServer)
@@ -22,7 +22,7 @@ def net_spawn(
 
 
 def net_destroy(entity: int | Entity):
-    from piegonote import Game
+    from pigeonote import Game
 
     try:
         server = Game.get_instance().find_service_by_type(GameServer)

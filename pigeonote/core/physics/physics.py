@@ -1,4 +1,4 @@
-from piegonote.core.physics import Collider
+from pigeonote.core.physics import Collider
 from pygame import Rect
 
 

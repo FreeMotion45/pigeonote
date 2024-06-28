@@ -1,7 +1,7 @@
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from piegonote import Game
+    from pigeonote import Game
 
 
 class Service:

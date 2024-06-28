@@ -1,6 +1,9 @@
-from piegonote import Component, Coordinate, get_coords_as_tuple
+from pathlib import Path
+from pigeonote import Component, Coordinate, get_coords_as_tuple
 
 import pygame as pg
+
+from pigeonote.core.entity import Entity
 
 
 def _coords_as_int_tuple(coords: Coordinate):
@@ -9,8 +12,30 @@ def _coords_as_int_tuple(coords: Coordinate):
 
 
 class TilemapRenderer(Component):
-    tileset: dict[str, pg.Surface] = dict()
+    tileset: dict[str | tuple[int, int], pg.Surface] = dict()
     tile_size: int = 10
+
+    def __init__(self, component_id: int, parent: Entity) -> None:
+        super().__init__(component_id, parent)
+        self._tiles = dict[tuple[int, int], str | tuple[int, int]]()
+
+    def load_tilset_from_file(self, file: Path | str, tilesize: int):
+        tilset_image = pg.image.load(file).convert_alpha()
+
+        msk = pg.Mask((tilesize, tilesize))
+        msk.fill()
+
+        for px in range(0, tilset_image.width, tilesize):
+            for py in range(0, tilset_image.height, tilesize):
+                tile_coords = px // tilesize, py // tilesize
+
+                tile_rect = pg.Rect((px, py), (tilesize, tilesize))
+
+                current_tile = pg.Surface((tilesize, tilesize), pg.SRCALPHA)
+                current_tile.blit(tilset_image, (0, 0), tile_rect)
+
+                if msk.overlap(pg.mask.from_surface(current_tile), (0, 0)):
+                    self.tileset[tile_coords] = current_tile
 
     def set_tile(self, coords: Coordinate, tile_name: str | None = None):
         int_coords = _coords_as_int_tuple(coords)
@@ -41,8 +66,6 @@ class TilemapRenderer(Component):
         return world_position[0] // self.tile_size, world_position[1] // self.tile_size  # type: ignore
 
     def init(self):
-        self._tiles = dict[tuple[int, int], str]()
-
         for tile_name in self.tileset:
             surface = self.tileset[tile_name]
 

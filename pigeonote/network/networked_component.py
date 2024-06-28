@@ -1,11 +1,11 @@
-from piegonote import Component, Entity
+from pigeonote import Component, Entity
 
 
 class NetworkedComponent(Component):
     def __init__(self, component_id: int, parent: Entity) -> None:
         super().__init__(component_id, parent)
 
-        from piegonote.network import GameClient, GameServer
+        from pigeonote.network import GameClient, GameServer
 
         try:
             self._client = self.game.find_service_by_type(GameClient)

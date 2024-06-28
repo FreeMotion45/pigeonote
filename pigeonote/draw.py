@@ -1,6 +1,7 @@
 import pygame as pg
 
-from piegonote.types import Color
+from pigeonote.types import Color
+
 
 def draw_rectangle_outline(surface: pg.Surface, rect: pg.Rect, width: int, color: Color):
     # Draw horizontal lines (top and bottom)

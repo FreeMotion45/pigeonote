@@ -3,8 +3,8 @@ import abc
 import pygame as pg
 
 if TYPE_CHECKING:
-    from piegonote import Entity
-    from piegonote.core.entity import ComponentType
+    from pigeonote import Entity
+    from pigeonote.core.entity import ComponentType
 
 
 class Component(abc.ABC):
@@ -63,7 +63,7 @@ class Component(abc.ABC):
         return self._entity.pixel_position
 
     @property
-    def active_camera(self):
+    def camera(self):
         """
         The currently active camera.
         """
@@ -84,7 +84,7 @@ class Component(abc.ABC):
 
     def destroy(self, obj: Optional["Component | Entity"] = None):
         # This is here because we can't import Entity at top level due to circular dependency.
-        from piegonote.core.entity import Entity
+        from pigeonote.core.entity import Entity
 
         if obj is None:
             obj = self

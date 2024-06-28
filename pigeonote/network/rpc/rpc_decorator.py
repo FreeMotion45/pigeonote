@@ -3,14 +3,14 @@ from typing import TYPE_CHECKING, Callable
 
 from pygame import Vector2
 
-from piegonote.network.messages.datagram_type import (
+from pigeonote.network.messages.datagram_type import (
     ToServerExecuteRPCDatagram,
     ToClientExecuteRPCDatagram,
 )
-from piegonote.network.rpc.rpc_recipient import RPCRecipient
+from pigeonote.network.rpc.rpc_recipient import RPCRecipient
 
 if TYPE_CHECKING:
-    from piegonote.network import NetworkedComponent
+    from pigeonote.network import NetworkedComponent
 
 
 def _serialize_method_params(func: Callable, args, kwargs):
@@ -27,7 +27,7 @@ def _deserialize_method_params(func: Callable, params: bytes):
 
 
 def rpc(recipient: RPCRecipient = RPCRecipient.Everyone):
-    from piegonote.network import GameServer, GameClient
+    from pigeonote.network import GameServer, GameClient
 
     def decorator(func):
         def wrapper(self: "NetworkedComponent", *args, **kwargs):

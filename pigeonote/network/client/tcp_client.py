@@ -5,7 +5,7 @@ import struct
 from threading import Thread
 from typing import Optional
 
-from piegonote.network.transports.tcp.socket_stream_wrapper import SocketStreamWrapper
+from pigeonote.network.transports.tcp.socket_stream_wrapper import SocketStreamWrapper
 
 
 class TCPClient:

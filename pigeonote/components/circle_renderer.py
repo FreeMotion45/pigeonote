@@ -1,4 +1,4 @@
-from piegonote import Component, Color
+from pigeonote import Component, Color
 
 
 class CircleRenderer(Component):
@@ -8,4 +8,4 @@ class CircleRenderer(Component):
 
     def render(self):
         self.width = self.width if self.width >= 0 else 0
-        self.active_camera.draw_circle(self.position, self.radius, self.color, width=self.width)
+        self.camera.draw_circle(self.position, self.radius, self.color, width=self.width)

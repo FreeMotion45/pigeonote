@@ -1,7 +1,8 @@
-from pygame import Vector2, Color as PyGameColor
+from pygame import Vector2, Rect, FRect, Color as PyGameColor
 
 Coordinate = tuple[int | float, int | float] | Vector2
 Color = int | str | tuple[int, int, int] | tuple[int, int, int, int] | PyGameColor
+AnyRect = Rect | FRect
 
 
 def get_coords_as_vector2(coord: Coordinate):

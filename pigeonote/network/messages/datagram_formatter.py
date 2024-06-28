@@ -1,7 +1,7 @@
 from io import BytesIO
 import struct
 from typing import BinaryIO, Iterator
-from piegonote.network.messages.datagram_type import *
+from pigeonote.network.messages.datagram_type import *
 
 DEFAULT_ENDIANITY = "<"
 INT8 = "b"

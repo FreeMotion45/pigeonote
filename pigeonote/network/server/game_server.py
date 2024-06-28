@@ -3,16 +3,16 @@ from dataclasses import dataclass
 from io import BytesIO
 from typing import Any, Callable, Optional
 
-from piegonote import Entity, Service
-from piegonote.network import (
+from pigeonote import Entity, Service
+from pigeonote.network import (
     DatagramFormatter,
     DatagramType,
     NetworkedComponent,
     Datagram,
     TCPServer,
 )
-from piegonote.network.messages.datagram_type import *
-from piegonote.types import Coordinate, get_coords_as_vector2
+from pigeonote.network.messages.datagram_type import *
+from pigeonote.types import Coordinate, get_coords_as_vector2
 
 ConnectionID = int
 

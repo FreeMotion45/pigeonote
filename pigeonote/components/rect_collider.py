@@ -1,5 +1,5 @@
 from pygame import Rect
-from piegonote.core.physics import Collider
+from pigeonote.core.physics import Collider
 
 
 class RectCollider(Collider):
@@ -29,7 +29,7 @@ class RectCollider(Collider):
 
         if self.auto_detect:
             try:
-                from piegonote.components import SpriteRenderer
+                from pigeonote.components import SpriteRenderer
 
                 renderer = self.entity.get_component_by_type(SpriteRenderer)
             except:
@@ -42,7 +42,7 @@ class RectCollider(Collider):
         super().update()
 
         if self._draw_debug_outline:
-            self.game.camera.draw_rect_outline(Rect(self.position, self.size))
+            self.camera.draw_rect(Rect(self.position, self.size), width=2)
 
     def check_rect_overlap(self, rect: Rect):
         return Rect(self.position + self.offset, self.size).colliderect(rect)

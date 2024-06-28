@@ -1,7 +1,7 @@
 from pygame import Rect
 
-from piegonote.components import TilemapRenderer
-from piegonote.core import Collider
+from pigeonote.components import TilemapRenderer
+from pigeonote.core import Collider
 
 
 class TilemapCollider(Collider):
@@ -25,7 +25,7 @@ class TilemapCollider(Collider):
             return
 
         tilesize = self._tilemap.tile_size
-        camera = self.active_camera
+        camera = self.camera
 
         visible_world_area = camera.area
         topleft, bottomright = (

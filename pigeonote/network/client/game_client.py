@@ -3,15 +3,15 @@ from dataclasses import dataclass
 from datetime import datetime
 from typing import Any, Callable, Optional
 
-from piegonote import Entity, Service
-from piegonote.network import (
+from pigeonote import Entity, Service
+from pigeonote.network import (
     DatagramFormatter,
     DatagramType,
     NetworkedComponent,
     Datagram,
     TCPClient,
 )
-from piegonote.network.messages.datagram_type import *
+from pigeonote.network.messages.datagram_type import *
 
 ConnectionID = int
 

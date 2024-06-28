@@ -2,7 +2,7 @@ from typing import Optional
 
 import pygame as pg
 
-from piegonote import Component
+from pigeonote import Component
 
 
 class SpriteRenderer(Component):

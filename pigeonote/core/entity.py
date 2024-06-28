@@ -1,9 +1,9 @@
 from typing import TYPE_CHECKING, Iterator, Optional, TypeVar
-from piegonote.core import Component
-from piegonote.types import Coordinate, get_coords_as_vector2
+from pigeonote.core import Component
+from pigeonote.types import Coordinate, get_coords_as_vector2
 
 if TYPE_CHECKING:
-    from piegonote import Game
+    from pigeonote import Game
 
 ComponentType = TypeVar("ComponentType", bound=Component)
 

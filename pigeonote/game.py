@@ -3,7 +3,7 @@ from typing import Optional, TypeVar
 
 import pygame as pg
 
-from piegonote import Camera2D, Entity, MouseButton, Service
+from pigeonote import Camera2D, Entity, MouseButton, Service
 
 from .types import Coordinate
 
@@ -184,13 +184,15 @@ class Game:
                     self._mouse_btns_up.add(mouse_button)
                     self._mouse_btns_pressed.remove(mouse_button)
 
-        self._dt = self._clock.tick(self._target_fps) / 1000
         self.update()
+        self._camera2d.render_frame()
 
         current_frame_surface = self._camera2d.get_rendered_surface()
         scaled_frame_surface = pg.transform.scale(current_frame_surface, self._display.get_size())
 
         self._display.blit(scaled_frame_surface, (0, 0))
+
+        self._dt = self._clock.tick(self._target_fps) / 1000
         return True
 
     def initialize(self):
