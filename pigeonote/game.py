@@ -24,9 +24,9 @@ class Game:
         self._is_actual_display = False
         if not display:
             pg.init()
-            display = pg.display.set_mode((16 * 100, 9 * 100), flags=pg.RESIZABLE)
+            display = pg.display.set_mode((16 * 100, 9 * 100))
             self._is_actual_display = True
-            pg.display.set_caption("Your my_fw game")
+            pg.display.set_caption("Your pigeonote game")
 
         self._running = False
 
@@ -78,6 +78,10 @@ class Game:
         display_width, display_height = pg.display.get_surface().size
         scale_x, scale_y = (camera_width / display_width, camera_height / display_height)
         return pg.Vector2(mouse_pos_x * scale_x, mouse_pos_y * scale_y)
+
+    @property
+    def mouse_world_position(self):
+        return self._camera2d.screen_position_to_world_position(self.mouse_screen_position)
 
     def is_mouse_btn_down(self, button: MouseButton):
         return button in self._mouse_btns_down

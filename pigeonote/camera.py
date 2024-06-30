@@ -9,15 +9,6 @@ from pigeonote.types import Color, Coordinate, get_coords_as_vector2
 
 
 class Camera2D:
-    """
-    I think the best way, is that the camera doesn't actually do any rendering when the
-    draw/blit/whatever function that renders is called. Instead, the camera should remember
-    what it needs to render this frame, but only actually do the rendering using a final: `render_frame` method.
-
-    This way we no will longer need the separation of render/update method in the component class
-    because the separation will occur within the framework.
-    """
-
     def __init__(self, area: Optional[Rect | FRect] = None) -> None:
         self._area = area or Rect((0, 0), pg.display.get_surface().get_size())
         self._surface = Surface(self._area.size)
@@ -91,12 +82,15 @@ class Camera2D:
         self._layering[layer].append(_perform_draw_line)
 
     def draw_rect_outline(self, rect: Rect | FRect, color: Color = "green", outline_width: int = 1):
+        rect = rect.copy()
         screen_rectangle = self.world_rect_to_screen_rect(rect)
         draw_rectangle_outline(self._surface, screen_rectangle, outline_width, color)
 
     def draw_rect(
         self, rect: Rect | FRect, color: Color = "green", width: float = 0, border_radius: float = -1, layer: int = 0
     ):
+        rect = rect.copy()
+
         def _perform_draw_rect():
             screen_rect = self.world_rect_to_screen_rect(rect)
             pg.draw.rect(self._surface, color, screen_rect, width=round(width), border_radius=round(border_radius))

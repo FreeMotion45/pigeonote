@@ -84,7 +84,12 @@ class Entity:
                 setattr(created_component_insance, var_name, instance_value)
 
             else:
-                setattr(created_component_insance, var_name, annotation())
+                try:
+                    actual_value = annotation()
+                except:
+                    actual_value = None
+
+                setattr(created_component_insance, var_name, actual_value)
 
         self._next_component_id += 1
 

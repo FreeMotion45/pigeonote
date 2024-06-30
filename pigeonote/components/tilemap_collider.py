@@ -46,7 +46,7 @@ class TilemapCollider(Collider):
             for x in range(topleft_tile_x, bottomright_tile_x):
                 if self._tilemap.has_tile_at((x, y)):
                     tile_rect = Rect(
-                        self._tilemap.render_position_of_tile((x, y)),
+                        self._tilemap.world_coords_of_tile((x, y)),
                         (tilesize, tilesize),
                     )
 

@@ -42,7 +42,13 @@ class RectCollider(Collider):
         super().update()
 
         if self._draw_debug_outline:
-            self.camera.draw_rect(Rect(self.position, self.size), width=2)
+            this_rect = Rect((0,0), self.size)
+            this_rect.center = self.position + self.offset
+            
+            self.camera.draw_rect(this_rect, width=2, layer=999)
 
     def check_rect_overlap(self, rect: Rect):
-        return Rect(self.position + self.offset, self.size).colliderect(rect)
+        this_rect = Rect((0,0), self.size)
+        this_rect.center = self.position + self.offset
+        
+        return this_rect.colliderect(rect)

@@ -10,7 +10,7 @@ def get_coords_as_vector2(coord: Coordinate):
         return Vector2(coord)
 
     assert isinstance(coord, Vector2)
-    return coord
+    return coord.copy()
 
 
 def get_coords_as_tuple(coord: Coordinate) -> tuple[int | float, int | float]:

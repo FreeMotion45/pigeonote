@@ -6,18 +6,23 @@ import pygame as pg
 from pigeonote.core.entity import Entity
 
 
+TilenameType = str | tuple[int, int]
+
+
 def _coords_as_int_tuple(coords: Coordinate):
     coords_tup = get_coords_as_tuple(coords)
     return int(coords_tup[0]), int(coords_tup[1])
 
 
 class TilemapRenderer(Component):
-    tileset: dict[str | tuple[int, int], pg.Surface] = dict()
+    tileset: dict[TilenameType, pg.Surface] = dict()
     tile_size: int = 10
+    layer: int = 0
+    draw_grid: bool = False
 
     def __init__(self, component_id: int, parent: Entity) -> None:
         super().__init__(component_id, parent)
-        self._tiles = dict[tuple[int, int], str | tuple[int, int]]()
+        self._tiles = dict[tuple[int, int], TilenameType]()
 
     def load_tilset_from_file(self, file: Path | str, tilesize: int):
         tilset_image = pg.image.load(file).convert_alpha()
@@ -37,7 +42,7 @@ class TilemapRenderer(Component):
                 if msk.overlap(pg.mask.from_surface(current_tile), (0, 0)):
                     self.tileset[tile_coords] = current_tile
 
-    def set_tile(self, coords: Coordinate, tile_name: str | None = None):
+    def set_tile(self, coords: Coordinate, tile_name: TilenameType | None = None):
         int_coords = _coords_as_int_tuple(coords)
 
         if tile_name is None:
@@ -52,7 +57,11 @@ class TilemapRenderer(Component):
     def has_tile_at(self, coords: Coordinate) -> bool:
         return _coords_as_int_tuple(coords) in self._tiles
 
-    def render_position_of_tile(self, coords: Coordinate):
+    def get_tile_at(self, coords: Coordinate) -> TilenameType | None:
+        coords_tup = _coords_as_int_tuple(coords)
+        return self._tiles.get(coords_tup, None)
+
+    def world_coords_of_tile(self, coords: Coordinate):
         """
         Return the world coordinates of the tile at `coords`.
         """
@@ -88,16 +97,22 @@ class TilemapRenderer(Component):
         )
 
         topleft_tile_x, topleft_tile_y = (
-            topleft[0] // self.tile_size,
-            topleft[1] // self.tile_size,
+            int(topleft[0] // self.tile_size),
+            int(topleft[1] // self.tile_size),
         )
         bottomright_tile_x, bottomright_tile_y = (
-            (bottomright[0] + self.tile_size - 1) // self.tile_size,
-            (bottomright[1] + self.tile_size - 1) // self.tile_size,
+            int((bottomright[0] + self.tile_size - 1) // self.tile_size),
+            int((bottomright[1] + self.tile_size - 1) // self.tile_size),
         )
 
         for y in range(topleft_tile_y, bottomright_tile_y):
             for x in range(topleft_tile_x, bottomright_tile_x):
                 if tile_image_name := self._tiles.get((x, y), None):
                     tile_image = self.tileset[tile_image_name]
-                    camera.blit(tile_image, self.render_position_of_tile((x, y)))
+
+                    tile_world_pos = self.world_coords_of_tile((x, y))
+                    camera.blit(tile_image, tile_world_pos, layer=self.layer)
+
+                    if self.draw_grid:
+                        tile_rect = pg.Rect(tile_world_pos, (tile_image.size))
+                        camera.draw_rect(tile_rect, "black", 1, layer=self.layer)
