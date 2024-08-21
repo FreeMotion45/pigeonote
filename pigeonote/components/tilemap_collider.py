@@ -24,22 +24,21 @@ class TilemapCollider(Collider):
         if self._tilemap is None:
             return
 
-        tilesize = self._tilemap.tile_size
-        camera = self.camera
+        # TODO: what the fuck? Why do I only check the range visible on camera?
 
-        visible_world_area = camera.area
+        tilesize = self._tilemap.tile_size
         topleft, bottomright = (
-            visible_world_area.topleft,
-            visible_world_area.bottomright,
+            rect.topleft,
+            rect.bottomright,
         )
 
         topleft_tile_x, topleft_tile_y = (
-            topleft[0] // tilesize,
-            topleft[1] // tilesize,
+            int((topleft[0] + tilesize - 1) // tilesize),
+            int((topleft[1] + tilesize - 1) // tilesize),
         )
         bottomright_tile_x, bottomright_tile_y = (
-            bottomright[0] // tilesize,
-            bottomright[1] // tilesize,
+            int((bottomright[0] + tilesize - 1) // tilesize),
+            int((bottomright[1] + tilesize - 1) // tilesize),
         )
 
         for y in range(topleft_tile_y, bottomright_tile_y):
