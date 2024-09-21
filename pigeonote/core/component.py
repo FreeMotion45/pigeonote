@@ -26,6 +26,8 @@ class Component(abc.ABC):
 
         self.find_entity_by_name = self.game.find_entity_by_name
 
+        self.py_init()
+
     @property
     def is_destroyed(self):
         return self._destroyed
@@ -124,7 +126,10 @@ class Component(abc.ABC):
         self.update()
 
     def log(self, obj: str):
-        print(f"[{type(self).__name__}] {obj}")
+        print(f"[{self.entity.name}-{type(self).__name__}] {obj}")
+
+    def py_init(self):
+        pass
 
     def init(self):
         pass

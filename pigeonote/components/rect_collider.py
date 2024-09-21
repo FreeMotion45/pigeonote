@@ -24,6 +24,11 @@ class RectCollider(Collider):
     def height(self, h: int):
         self.size = (self.size[0], h)
 
+    def get_collider_rect(self):
+        rect = Rect((0, 0), self.size)
+        rect.center = self.position + self.offset
+        return rect
+
     def init(self):
         super().init()
 
@@ -38,17 +43,11 @@ class RectCollider(Collider):
             if renderer is not None and renderer.sprite_surface is not None:
                 self.size = renderer.sprite_surface.size
 
-    def update(self):
-        super().update()
+    def render(self):
+        super().render()
 
         if self._draw_debug_outline:
-            this_rect = Rect((0,0), self.size)
-            this_rect.center = self.position + self.offset
-            
-            self.camera.draw_rect(this_rect, width=2, layer=999)
+            self.camera.draw_rect(self.get_collider_rect(), width=2, layer=999)
 
     def check_rect_overlap(self, rect: Rect):
-        this_rect = Rect((0,0), self.size)
-        this_rect.center = self.position + self.offset
-        
-        return this_rect.colliderect(rect)
+        return self.get_collider_rect().colliderect(rect)

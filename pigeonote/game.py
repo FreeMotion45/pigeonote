@@ -1,5 +1,5 @@
 import uuid
-from typing import Optional, TypeVar
+from typing import Literal, Optional, TypeVar, overload
 
 import pygame as pg
 
@@ -92,10 +92,21 @@ class Game:
     def is_mouse_btn_pressed(self, button: MouseButton):
         return button in self._mouse_btns_pressed
 
-    def find_entity_by_name(self, name: str) -> Optional[Entity]:
+    @overload
+    def find_entity_by_name(self, name: str, raise_if_not_found: Literal[False]) -> Optional[Entity]: ...
+    @overload
+    def find_entity_by_name(self, name: str, raise_if_not_found: Literal[True]) -> Entity: ...
+
+    # Note: the return typehint in the overload below depends on the default value of `raise_if_not_found`.
+    @overload
+    def find_entity_by_name(self, name: str) -> Entity: ...
+    def find_entity_by_name(self, name: str, raise_if_not_found: bool = True) -> Optional[Entity]:
         candidates = [e for e in self._entities if e.name == name]
         if candidates:
             return candidates[0]
+
+        if raise_if_not_found:
+            raise LookupError(f"Couldn't find entity with name: `{name}`.")
 
     def find_service_by_name(self, name: str) -> Optional[Service]:
         candidates = [s for s in self._services if s.name == name]
@@ -113,7 +124,7 @@ class Game:
         if name is None:
             name = f"entity_{str(uuid.uuid4())}"
 
-        if self.find_entity_by_name(name):
+        if self.find_entity_by_name(name, raise_if_not_found=False):
             raise KeyError(f"Can't create entity with name: `{name}`, because an entity with this name already exists.")
 
         new_entity = Entity(name=name, position=position, game=self)
@@ -192,9 +203,7 @@ class Game:
         self._camera2d.render_frame()
 
         current_frame_surface = self._camera2d.get_rendered_surface()
-        scaled_frame_surface = pg.transform.scale(current_frame_surface, self._display.get_size())
-
-        self._display.blit(scaled_frame_surface, (0, 0))
+        pg.transform.scale(current_frame_surface, self._display.get_size(), dest_surface=self._display)
 
         self._dt = self._clock.tick(self._target_fps) / 1000
         return True
